@@ -257,12 +257,30 @@ body{
 
   .tag-cloud{justify-content:center;}
 
-  .contact-wrap{padding:28px 16px;}
+  /* Contact fix */
+  .contact-wrap{padding:24px 14px;}
   .contact-wrap h2{font-size:clamp(32px,10vw,56px);}
-  .contact-links{flex-direction:column;align-items:stretch;width:100%;}
-  .contact-links .btn{justify-content:center;width:100%;}
+  .contact-links{flex-direction:column;align-items:stretch;width:100%;gap:10px;}
+  .contact-links .btn{
+    justify-content:center;
+    width:100%;
+    font-size:13px;
+    padding:12px 14px;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+  }
 
-  .topnav{top:10px;width:calc(100% - 24px);}
+  /* Topnav fix */
+  .topnav{
+    top:10px;
+    width:calc(100% - 24px);
+    left:50%;
+    transform:translateX(-50%);
+  }
+  .topnav-inner{padding:8px 14px;}
+  .topnav-links{gap:8px;}
+  .topnav-links a.topnav-cta{padding:7px 12px;font-size:11px;}
 }
 
 .wrap{
