@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Masoud Jafari — Video Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-deep:#050807;
+  --bg-grad-1:#0f2419;
+  --bg-grad-2:#08130d;
+  --glass:rgba(255,255,255,0.05);
+  --glass-border:rgba(255,255,255,0.12);
+  --teal:#39ff8c;
+  --orange:#0fa968;
+  --text:#eef2f3;
+  --text-dim:#9aa6a8;
+  --mono:'JetBrains Mono', monospace;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html{scroll-behavior:smooth;}
+
+body{
+  font-family:'Inter', sans-serif;
+  background:var(--bg-deep);
+  color:var(--text);
+  overflow-x:hidden;
+  min-height:100vh;
+}
+
+.bg-wash{
+  position:fixed;
+  inset:0;
+  z-index:-2;
+  background:var(--bg-deep);
+  overflow:hidden;
+}
+.blob{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(90px);
+  opacity:.55;
+  will-change:transform;
+}
+.blob-1{
+  width:55vw;height:55vw;
+  background:radial-gradient(circle, #0f2419 0%, transparent 70%);
+  top:-10%;left:-15%;
+  animation:blob1 18s ease-in-out infinite alternate;
+}
+.blob-2{
+  width:45vw;height:45vw;
+  background:radial-gradient(circle, #163c28 0%, transparent 70%);
+  bottom:-10%;right:-10%;
+  animation:blob2 22s ease-in-out infinite alternate;
+}
+.blob-3{
+  width:35vw;height:35vw;
+  background:radial-gradient(circle, rgba(57,255,140,.08) 0%, transparent 70%);
+  top:40%;left:50%;
+  animation:blob3 26s ease-in-out infinite alternate;
+}
+.blob-4{
+  width:30vw;height:30vw;
+  background:radial-gradient(circle, rgba(15,169,104,.07) 0%, transparent 70%);
+  top:10%;right:20%;
+  animation:blob4 20s ease-in-out infinite alternate;
+}
+
+@keyframes blob1{
+  0%  {transform:translate(0,0) scale(1);}
+  33% {transform:translate(6vw,8vh) scale(1.08);}
+  66% {transform:translate(-4vw,14vh) scale(.94);}
+  100%{transform:translate(10vw,4vh) scale(1.05);}
+}
+@keyframes blob2{
+  0%  {transform:translate(0,0) scale(1);}
+  33% {transform:translate(-8vw,-10vh) scale(1.1);}
+  66% {transform:translate(5vw,-6vh) scale(.92);}
+  100%{transform:translate(-12vw,4vh) scale(1.06);}
+}
+@keyframes blob3{
+  0%  {transform:translate(0,0) scale(1);}
+  50% {transform:translate(-10vw,-12vh) scale(1.15);}
+  100%{transform:translate(8vw,10vh) scale(.9);}
+}
+@keyframes blob4{
+  0%  {transform:translate(0,0) scale(1);}
+  50% {transform:translate(6vw,14vh) scale(1.12);}
+  100%{transform:translate(-8vw,6vh) scale(.95);}
+}
+
+#particles{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+}
+.grain{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  opacity:.05;
+  pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;
+}
+
+.timeline-nav{
+  position:fixed;
+  top:0;
+  left:0;
+  height:100vh;
+  width:64px;
+  z-index:100;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border-right:1px solid var(--glass-border);
+  background:rgba(255,255,255,0.02);
+  backdrop-filter:blur(10px);
+}
+.timeline-track{
+  position:relative;
+  height:60%;
+  width:2px;
+  background:linear-gradient(to bottom, transparent, var(--glass-border) 10%, var(--glass-border) 90%, transparent);
+}
+.tc-mark{
+  position:absolute;
+  left:-9px;
+  width:20px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  cursor:pointer;
+  background:none;
+  border:none;
+  color:var(--text-dim);
+  font-family:var(--mono);
+  transform:translateY(-50%);
+}
+.tc-mark .dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--bg-deep);
+  border:2px solid var(--text-dim);
+  transition:.35s;
+}
+.tc-mark .label{
+  font-size:9px;
+  letter-spacing:.05em;
+  writing-mode:vertical-rl;
+  white-space:nowrap;
+  transition:.35s;
+  opacity:0;
+  transform:translateY(8px);
+}
+.tc-mark.active .dot{
+  background:var(--teal);
+  border-color:var(--teal);
+  box-shadow:0 0 12px var(--teal);
+}
+.tc-mark.active .label{color:var(--teal);opacity:1;transform:translateY(0);}
+.tc-mark:hover .label{opacity:1;transform:translateY(0);}
+.tc-mark:hover .dot{border-color:var(--teal);}
+
+@media (max-width:860px){
+  .timeline-nav{display:none;}
+}
+
+/* ===== Top nav ===== */
+.topnav{
+  position:fixed;
+  top:18px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:200;
+  width:min(680px, calc(100% - 32px));
+  border-radius:999px;
+  padding:0;
+}
+.topnav-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 22px;
+}
+.topnav-brand{
+  display:flex;
+  align-items:center;
+  color:var(--teal);
+  text-decoration:none;
+  transition:.25s;
+}
+.topnav-brand:hover{color:var(--orange);}
+.topnav-links{
+  display:flex;
+  align-items:center;
+  gap:22px;
+}
+.topnav-links a{
+  font-family:var(--mono);
+  font-size:12.5px;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  text-decoration:none;
+  transition:.25s;
+}
+.topnav-links a:hover{color:var(--teal);}
+.topnav-links a.topnav-cta{
+  color:var(--bg-deep);
+  background:linear-gradient(120deg, var(--teal), var(--orange));
+  padding:8px 16px;
+  border-radius:999px;
+  font-weight:600;
+}
+.topnav-links a.topnav-cta:hover{color:var(--bg-deep);opacity:.9;}
+
+@media (max-width:520px){
+  .topnav-links{gap:12px;}
+  .topnav-links a:not(.topnav-cta){display:none;}
+}
+
+.wrap{
+  max-width:1100px;
+  margin:0 auto;
+  padding:0 32px;
+}
+section{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:60px 0;
+  position:relative;
+}
+
+.glass{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:18px;
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+}
+
+.hero{
+  align-items:flex-start;
+  padding-top:120px;
+}
+.hero-spacer{height:24px;}
+
+.hero h1{
+  font-family:'Bebas Neue', sans-serif;
+  font-size:clamp(56px,11vw,128px);
+  line-height:1;
+  letter-spacing:.03em;
+  background:linear-gradient(120deg, #fff 30%, var(--teal) 55%, var(--orange) 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  margin-bottom:6px;
+}
+.hero .role{
+  font-size:clamp(20px,3.4vw,32px);
+  color:var(--text-dim);
+  font-weight:500;
+  margin-bottom:28px;
+}
+.hero .role b{color:var(--text);font-weight:700;}
+
+.hero p.lead{
+  max-width:540px;
+  font-size:17px;
+  line-height:1.95;
+  color:var(--text-dim);
+  margin-bottom:38px;
+}
+
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;}
+.btn{
+  font-family:'Inter',sans-serif;
+  font-weight:600;
+  font-size:15px;
+  padding:14px 28px;
+  border-radius:999px;
+  border:1px solid var(--glass-border);
+  cursor:pointer;
+  text-decoration:none;
+  color:var(--text);
+  transition:.3s;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn-primary{
+  background:linear-gradient(120deg, var(--teal), var(--orange));
+  color:#050807;
+  border:none;
+  box-shadow:0 8px 28px -10px var(--orange);
+}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 14px 34px -10px var(--orange);}
+.btn svg{flex-shrink:0;}
+.btn-ghost{background:var(--glass);backdrop-filter:blur(12px);}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-3px);}
+
+.sec-head{margin-bottom:54px;}
+.sec-tc{
+  font-family:var(--mono);
+  color:var(--orange);
+  font-size:13px;
+  letter-spacing:.2em;
+  margin-bottom:10px;
+}
+.sec-head h2{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(36px,6vw,64px);
+  letter-spacing:.02em;
+}
+.sec-head .sub{color:var(--text-dim);margin-top:10px;max-width:520px;line-height:1.9;}
+
+.about-grid{
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+}
+.about-card{padding:38px;}
+.about-card p{line-height:2;color:var(--text-dim);font-size:15.5px;margin-bottom:16px;}
+.about-card p:last-child{margin-bottom:0;}
+.about-card strong{color:var(--teal);}
+
+.stats-row{
+  display:flex;
+  gap:20px;
+  padding:30px;
+}
+.stat-item{
+  flex:1;
+  text-align:center;
+  border-left:1px solid var(--glass-border);
+  padding-left:20px;
+}
+.stat-item:first-child{border-left:none;padding-left:0;}
+.stat-item .num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--orange);}
+.stat-item .num span{font-size:18px;color:var(--teal);}
+.stat-item .lbl{color:var(--text-dim);font-size:13px;margin-top:6px;}
+
+@media(max-width:600px){
+  .stats-row{flex-direction:column;gap:18px;}
+  .stat-item{border-left:none;border-top:1px solid var(--glass-border);padding:16px 0 0;}
+  .stat-item:first-child{border-top:none;padding-top:0;}
+}
+
+.skills-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:18px;
+  margin-bottom:24px;
+}
+.skill-card{
+  padding:26px;
+  position:relative;
+  transition:.35s;
+}
+.skill-card:hover{
+  transform:translateY(-6px);
+  border-color:var(--teal);
+  box-shadow:0 14px 40px -16px rgba(57,255,140,.35);
+}
+.sw-logo{
+  width:52px;
+  height:52px;
+  border-radius:10px;
+  margin-bottom:18px;
+  flex-shrink:0;
+  display:block;
+}
+.skill-card h3{font-size:17px;margin-bottom:8px;font-weight:700;}
+.skill-card p{font-size:13.5px;color:var(--text-dim);line-height:1.8;}
+
+.tag-cloud{
+  padding:26px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.tag-cloud span{
+  font-family:var(--mono);
+  font-size:12.5px;
+  border:1px solid var(--glass-border);
+  border-radius:999px;
+  padding:8px 16px;
+  color:var(--text);
+  background:rgba(255,255,255,.03);
+  transition:.3s;
+}
+.tag-cloud span:hover{
+  border-color:var(--teal);
+  color:var(--teal);
+  transform:translateY(-2px);
+}
+
+.proj-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+@media(max-width:860px){.proj-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){.proj-grid{grid-template-columns:1fr;max-width:320px;margin:0 auto;}}
+
+.proj-card{
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  transition:.35s cubic-bezier(.25,.8,.25,1);
+  border-radius:16px;
+}
+.proj-card:hover{
+  transform:translateY(-8px);
+  border-color:rgba(57,255,140,.4);
+  box-shadow:0 20px 50px -16px rgba(57,255,140,.18);
+}
+.proj-thumb{
+  aspect-ratio:9/16;
+  position:relative;
+  background:#0a1a0e;
+  overflow:hidden;
+  flex-shrink:0;
+}
+.proj-thumb iframe,
+.proj-thumb video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border:0;
+  z-index:1;
+}
+.proj-body{
+  padding:18px 20px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  background:rgba(255,255,255,.03);
+  border-top:1px solid var(--glass-border);
+}
+.proj-tag{
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--orange);
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
+.proj-body h3{
+  font-size:15px;
+  font-weight:700;
+  color:var(--text);
+  line-height:1.3;
+}
+.proj-body p{
+  font-size:12.5px;
+  color:var(--text-dim);
+  line-height:1.75;
+  margin-top:2px;
+}
+.proj-tools{
+  display:flex;
+  gap:6px;
+  margin-top:8px;
+  flex-wrap:wrap;
+}
+.proj-tools span{
+  font-family:var(--mono);
+  font-size:10px;
+  border:1px solid var(--glass-border);
+  border-radius:5px;
+  padding:3px 7px;
+  color:var(--text-dim);
+}
+
+.contact-wrap{
+  padding:50px;
+  text-align:center;
+  display:flex;flex-direction:column;align-items:center;
+}
+.contact-wrap h2{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(40px,8vw,90px);
+  background:linear-gradient(120deg,var(--teal),var(--orange));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin-bottom:18px;
+}
+.contact-wrap p{color:var(--text-dim);max-width:480px;line-height:1.9;margin-bottom:34px;}
+.contact-links{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+
+footer{
+  text-align:center;
+  padding:30px 0;
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--text-dim);
+  letter-spacing:.1em;
+}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s ease, transform .8s ease;}
+.reveal.in{opacity:1;transform:translateY(0);}
+
+@media (prefers-reduced-motion: reduce){
+  .reveal{opacity:1;transform:none;transition:none;}
+  html{scroll-behavior:auto;}
+}
+
+a:focus-visible, button:focus-visible{
+  outline:2px solid var(--teal);
+  outline-offset:3px;
+}
+</style>
+</head>
+<body>
+
+<div class="bg-wash">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
+</div>
+<canvas id="particles"></canvas>
+<div class="grain"></div>
+
+<nav class="topnav glass" aria-label="Main navigation">
+  <div class="topnav-inner">
+    <a href="#hero" class="topnav-brand" aria-label="Home">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="9" width="18" height="12" rx="2" fill="currentColor" opacity="0.18"/>
+        <rect x="3" y="9" width="18" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M3 9L7 4H10L7 9H3Z" fill="currentColor"/>
+        <path d="M9 9L13 4H16L13 9H9Z" fill="currentColor"/>
+        <path d="M15 9L19 4H21V9H15Z" fill="currentColor"/>
+      </svg>
+    </a>
+    <div class="topnav-links">
+      <a href="#about">About</a>
+      <a href="#skills">Skills</a>
+      <a href="#projects">Projects</a>
+      <a href="#contact" class="topnav-cta">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<nav class="timeline-nav" aria-label="Section navigation">
+  <div class="timeline-track">
+    <button class="tc-mark active" data-target="#hero" style="top:0%" aria-label="Intro">
+      <span class="dot"></span><span class="label">Intro</span>
+    </button>
+    <button class="tc-mark" data-target="#about" style="top:25%" aria-label="About">
+      <span class="dot"></span><span class="label">About</span>
+    </button>
+    <button class="tc-mark" data-target="#skills" style="top:50%" aria-label="Skills">
+      <span class="dot"></span><span class="label">Skills</span>
+    </button>
+    <button class="tc-mark" data-target="#projects" style="top:75%" aria-label="Projects">
+      <span class="dot"></span><span class="label">Projects</span>
+    </button>
+    <button class="tc-mark" data-target="#contact" style="top:100%" aria-label="Contact">
+      <span class="dot"></span><span class="label">Contact</span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero" class="hero">
+  <div class="wrap">
+    <div class="hero-spacer"></div>
+    <h1>MASOUD JAFARI</h1>
+    <p class="role">Video <b>Editor &amp; Motion Cutter</b> — storytelling on the timeline</p>
+    <p class="lead">
+      I edit fast-paced short videos with strong hooks and tight pacing,
+      plus polished real estate walkthrough videos that make properties stand out.
+      From raw footage to scroll-stopping cuts — pacing, captions, color and sound,
+      all dialed in to keep viewers watching to the end.
+    </p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn btn-primary">View Projects ▶</a>
+      <a href="#contact" class="btn btn-ghost">Start a Project</a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tc">About</div>
+      <h2>Behind the Timeline</h2>
+      <div class="sub">From raw clips to a finished story — here's how I work.</div>
+    </div>
+    <div class="about-grid reveal">
+      <div class="glass about-card">
+        <p>
+          I'm a video editor focused on <strong>short videos</strong> — built for quick,
+          punchy storytelling that hooks viewers in the first second and holds their
+          attention until the last.
+        </p>
+        <p>
+          I also edit <strong>real estate videos</strong>: cinematic property walkthroughs,
+          drone footage cuts, and listing reels that highlight a home's best features and
+          help it sell faster.
+        </p>
+        <p>
+          I use <strong>After Effects</strong> as my main editing tool — building the entire
+          cut, motion graphics, animated captions and transitions inside AE for full creative control.
+        </p>
+        <p>
+          <strong>Premiere Pro</strong> handles rough cuts, multi-track sound design and
+          color grading, while <strong>Photoshop</strong> covers thumbnails, cover frames
+          and any graphic elements the project needs.
+        </p>
+      </div>
+      <div class="glass stats-row">
+        <div class="stat-item">
+          <div class="num">50<span>+</span></div>
+          <div class="lbl">Projects Completed</div>
+        </div>
+        <div class="stat-item">
+          <div class="num">1<span>yr</span></div>
+          <div class="lbl">Year of Experience</div>
+        </div>
+        <div class="stat-item">
+          <div class="num">98<span>%</span></div>
+          <div class="lbl">Happy Clients</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tc">Skills</div>
+      <h2>Tools &amp; Techniques</h2>
+      <div class="sub">The software I use and what I bring to every edit.</div>
+    </div>
+    <div class="skills-grid reveal">
+      <div class="glass skill-card">
+        <img class="sw-logo" src="https://img.icons8.com/color/96/adobe-after-effects.png" alt="Adobe After Effects" loading="lazy">
+        <h3>After Effects</h3>
+        <p>My main editing software — full cuts, motion graphics, animated captions, transitions and effects all built inside AE.</p>
+      </div>
+      <div class="glass skill-card">
+        <img class="sw-logo" src="https://img.icons8.com/color/96/adobe-premiere-pro.png" alt="Adobe Premiere Pro" loading="lazy">
+        <h3>Premiere Pro</h3>
+        <p>Used for rough cuts, multi-track sound design and color grading to give every video a clean, professional finish.</p>
+      </div>
+      <div class="glass skill-card">
+        <img class="sw-logo" src="https://img.icons8.com/color/96/adobe-photoshop.png" alt="Adobe Photoshop" loading="lazy">
+        <h3>Photoshop</h3>
+        <p>Thumbnails, cover frames and graphic elements designed to match each project's look.</p>
+      </div>
+    </div>
+
+    <div class="glass tag-cloud reveal">
+      <span>Short Video Editing</span>
+      <span>Real Estate Edits</span>
+      <span>Motion Graphics</span>
+      <span>Sound Design</span>
+      <span>Color Grading</span>
+      <span>Captions &amp; Titles</span>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tc">Projects</div>
+      <h2>Selected Work</h2>
+      <div class="sub">A look at projects I've worked on this season.</div>
+    </div>
+    <div class="proj-grid reveal">
+
+      <div class="glass proj-card">
+        <div class="proj-thumb">
+          <iframe src="https://drive.google.com/file/d/1IIG-BpfZU5K8wN6_PfHa1zXrNbb6Atbe/preview" allowfullscreen loading="lazy" title="Real Estate Reel"></iframe>
+        </div>
+        <div class="proj-body">
+          <div class="proj-tag">Real Estate</div>
+          <h3>Real Estate Reel</h3>
+          <p>A sharp vertical reel showcasing a property with smooth transitions, cinematic color and motion captions built for social reach.</p>
+          <div class="proj-tools"><span>After Effects</span><span>9:16</span><span>Color</span></div>
+        </div>
+      </div>
+
+      <div class="glass proj-card">
+        <div class="proj-thumb">
+          <iframe src="https://drive.google.com/file/d/1Cs-8Lp06aY9z4gHBpi0Dxv2NmikbVNzZ/preview" allowfullscreen loading="lazy" title="Cake & Dessert Teaser"></iframe>
+        </div>
+        <div class="proj-body">
+          <div class="proj-tag">Teaser</div>
+          <h3>Cake & Dessert Teaser</h3>
+          <p>A short cinematic teaser for a cake and dessert brand — built purely on visuals, tight cuts and sound design to create appetite and mood without a single line of text.</p>
+          <div class="proj-tools"><span>After Effects</span><span>Sound Design</span><span>Color</span></div>
+        </div>
+      </div>
+
+      <div class="glass proj-card">
+        <div class="proj-thumb">
+          <iframe src="https://drive.google.com/file/d/1MUQWapeQ6bjaLK6JeaAdg1vQbDUSBl1f/preview" allowfullscreen loading="lazy" title="Action Edit"></iframe>
+        </div>
+        <div class="proj-body">
+          <div class="proj-tag">Action / Drama</div>
+          <h3>Action Edit</h3>
+          <p>High-energy action sequence with dynamic cuts, impactful sound design and motion effects that amplify every moment.</p>
+          <div class="proj-tools"><span>After Effects</span><span>Sound Design</span></div>
+        </div>
+      </div>
+
+      <div class="glass proj-card">
+        <div class="proj-thumb">
+          <iframe src="https://drive.google.com/file/d/1KqXz1iupWAGyFwn9JTxNlNlQmx7neyH7/preview" allowfullscreen loading="lazy" title="Store Commercial"></iframe>
+        </div>
+        <div class="proj-body">
+          <div class="proj-tag">Commercial</div>
+          <h3>Plumbing Store Ad</h3>
+          <p>Clean product commercial for a plumbing fixtures store — smooth product reveals, branded motion titles and a polished color grade.</p>
+          <div class="proj-tools"><span>After Effects</span><span>Premiere</span><span>Color</span></div>
+        </div>
+      </div>
+
+      <div class="glass proj-card">
+        <div class="proj-thumb">
+          <iframe src="https://drive.google.com/file/d/13C7OgsvzcRPGPAC1gApxCH6s4e0AvI7z/preview" allowfullscreen loading="lazy" title="Real Estate Walkthrough"></iframe>
+        </div>
+        <div class="proj-body">
+          <div class="proj-tag">Real Estate</div>
+          <h3>Real Estate Walkthrough</h3>
+          <p>Cinematic property walkthrough edit with smooth scene flow, warm color grading and motion overlays that highlight every key space.</p>
+          <div class="proj-tools"><span>After Effects</span><span>Color</span><span>4K</span></div>
+        </div>
+      </div>
+
+      <div class="glass proj-card">
+        <div class="proj-thumb">
+          <iframe src="https://drive.google.com/file/d/1Z6kuAifnEA89fOhVU6H8u-tyUV6OG6gF/preview" allowfullscreen loading="lazy" title="Property Introduction Edit"></iframe>
+        </div>
+        <div class="proj-body">
+          <div class="proj-tag">Real Estate</div>
+          <h3>Property Introduction Edit</h3>
+          <p>A cinematic real estate intro featuring styled text animations, smooth speed ramps and dynamic transitions — built to present the property with impact.</p>
+          <div class="proj-tools"><span>After Effects</span><span>Speed Ramp</span><span>Transitions</span><span>Text Styles</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="wrap">
+    <div class="glass contact-wrap reveal">
+      <div class="sec-tc">Contact</div>
+      <h2>That's a Wrap!</h2>
+      <p>Your next project is ready to be edited. Get in touch to talk Reels, Shorts, real estate videos or anything else on your timeline.</p>
+      <div class="contact-links">
+        <a href="mailto:masoud00ma@gmail.com" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          masoud00ma@gmail.com
+        </a>
+        <a href="https://www.linkedin.com/in/masoud-jafari-878a42414" class="btn btn-ghost">
+          <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="5" fill="#0A66C2"/><text x="4.5" y="17" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#fff">in</text></svg>
+          LinkedIn
+        </a>
+        <a href="https://instagram.com/masoudedits" class="btn btn-ghost">
+          <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="igGrad" x1="0" y1="1" x2="1" y2="0">
+              <stop offset="0" stop-color="#FED576"/><stop offset="0.26" stop-color="#F47133"/><stop offset="0.61" stop-color="#BC3081"/><stop offset="1" stop-color="#4C63D2"/>
+            </linearGradient></defs>
+            <rect width="24" height="24" rx="6" fill="url(#igGrad)"/>
+            <rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="#fff" stroke-width="1.6"/>
+            <circle cx="12" cy="12" r="3.6" fill="none" stroke="#fff" stroke-width="1.6"/>
+            <circle cx="17" cy="7" r="1" fill="#fff"/>
+          </svg>
+          Instagram
+        </a>
+        <a href="https://t.me/masoud00jf" class="btn btn-ghost">
+          <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="12" fill="#26A5E4"/>
+            <path d="M5.5 12.2l11-4.4c.6-.2 1.1.2.9.9l-2 9.4c-.1.6-.7.8-1.2.5l-3-2.2-1.5 1.4c-.2.2-.5.1-.5-.2l.3-2.9 6.4-5.8c.2-.2-.1-.4-.3-.2l-7.9 5-3.2-1c-.6-.2-.6-1 .1-1.2z" fill="#fff"/>
+          </svg>
+          Telegram
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 MASOUD JAFARI — VIDEO EDITOR</footer>
+
+<script>
+const reveals = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+},{threshold:0.15});
+reveals.forEach(r=>io.observe(r));
+
+const marks = document.querySelectorAll('.tc-mark');
+const sections = [...marks].map(m=>document.querySelector(m.dataset.target));
+const navIO = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      const idx = sections.indexOf(entry.target);
+      marks.forEach(m=>m.classList.remove('active'));
+      if(marks[idx]) marks[idx].classList.add('active');
+    }
+  });
+},{threshold:0.5});
+sections.forEach(s=>s && navIO.observe(s));
+
+marks.forEach(m=>{
+  m.addEventListener('click', ()=>{
+    document.querySelector(m.dataset.target).scrollIntoView({behavior:'smooth'});
+  });
+});
+
+// ---- Particle system ----
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight;}
+resize();
+window.addEventListener('resize', resize);
+
+const PARTICLE_COUNT = 55;
+const particles = Array.from({length:PARTICLE_COUNT},()=>({
+  x: Math.random()*innerWidth,
+  y: Math.random()*innerHeight,
+  r: Math.random()*1.4+.3,
+  vx:(Math.random()-.5)*.22,
+  vy:(Math.random()-.5)*.22,
+  alpha: Math.random()*.5+.08,
+  hue: Math.random()<.65 ? 145 : 160,
+}));
+
+function drawParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.x += p.vx; p.y += p.vy;
+    if(p.x<0) p.x=canvas.width;
+    if(p.x>canvas.width) p.x=0;
+    if(p.y<0) p.y=canvas.height;
+    if(p.y>canvas.height) p.y=0;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`hsla(${p.hue},100%,65%,${p.alpha})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+</script>
+</body>
+</html>
