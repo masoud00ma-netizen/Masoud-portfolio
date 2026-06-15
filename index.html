@@ -485,16 +485,94 @@ section{
   background:#0a1a0e;
   overflow:hidden;
   flex-shrink:0;
+  cursor:pointer;
 }
-.proj-thumb iframe,
-.proj-thumb video{
+/* ===== proj-thumb ===== */
+.proj-thumb iframe,.proj-thumb video{display:none;}
+.proj-thumb.loaded::after{content:none;}
+/* Click-to-play overlay */
+.proj-thumb .thumb-overlay{
   position:absolute;
   inset:0;
-  width:100%;
-  height:100%;
-  border:0;
-  z-index:1;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  background:linear-gradient(160deg,#0a1a0e 0%,#0f2419 100%);
+  transition:.3s;
+  cursor:pointer;
 }
+.proj-thumb .play-btn{
+  width:60px;height:60px;
+  border-radius:50%;
+  background:rgba(57,255,140,.15);
+  border:2px solid var(--teal);
+  display:flex;align-items:center;justify-content:center;
+  z-index:3;
+  transition:.3s;
+  flex-shrink:0;
+}
+.proj-thumb:hover .play-btn{
+  background:rgba(57,255,140,.3);
+  transform:scale(1.1);
+}
+.proj-thumb .play-btn svg{margin-left:4px;}
+
+/* ===== Fullscreen Video Modal ===== */
+.vid-modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:rgba(0,0,0,.97);
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+.vid-modal.open{display:flex;}
+.vid-modal-video{
+  width:min(90vw, 48vh);
+  aspect-ratio:9/16;
+  position:relative;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 0 60px rgba(57,255,140,.12);
+}
+.vid-modal-video iframe{
+  position:absolute;
+  inset:0;width:100%;height:115%;
+  border:0;
+}
+.vid-modal-actions{
+  display:flex;
+  gap:14px;
+  margin-top:22px;
+}
+.vid-modal-actions button{
+  font-family:'Inter',sans-serif;
+  font-weight:600;
+  font-size:14px;
+  padding:12px 24px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  display:flex;align-items:center;gap:8px;
+  transition:.25s;
+}
+.btn-rewatch{
+  background:linear-gradient(120deg,var(--teal),var(--orange));
+  color:#050807;
+}
+.btn-rewatch:hover{transform:translateY(-2px);}
+.btn-exit{
+  background:rgba(255,255,255,.08);
+  color:var(--text);
+  border:1px solid var(--glass-border) !important;
+}
+.btn-exit:hover{border-color:var(--teal) !important;color:var(--teal);transform:translateY(-2px);}
+
 .proj-body{
   padding:18px 20px 20px;
   display:flex;
@@ -502,6 +580,9 @@ section{
   gap:6px;
   background:rgba(255,255,255,.03);
   border-top:1px solid var(--glass-border);
+  position:static;
+  z-index:auto;
+  margin-top:0;
 }
 .proj-tag{
   font-family:var(--mono);
@@ -741,8 +822,10 @@ a:focus-visible, button:focus-visible{
     <div class="proj-grid reveal">
 
       <div class="glass proj-card">
-        <div class="proj-thumb">
-          <iframe src="https://drive.google.com/file/d/1IIG-BpfZU5K8wN6_PfHa1zXrNbb6Atbe/preview" allowfullscreen loading="lazy" title="Real Estate Reel"></iframe>
+        <div class="proj-thumb" data-src="https://drive.google.com/file/d/1IIG-BpfZU5K8wN6_PfHa1zXrNbb6Atbe/preview">
+          <div class="thumb-overlay" style="background:linear-gradient(145deg,#0a2e1a,#163c28);">
+            <div class="play-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--teal)"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
         </div>
         <div class="proj-body">
           <div class="proj-tag">Real Estate</div>
@@ -753,8 +836,10 @@ a:focus-visible, button:focus-visible{
       </div>
 
       <div class="glass proj-card">
-        <div class="proj-thumb">
-          <iframe src="https://drive.google.com/file/d/1Cs-8Lp06aY9z4gHBpi0Dxv2NmikbVNzZ/preview" allowfullscreen loading="lazy" title="Cake & Dessert Teaser"></iframe>
+        <div class="proj-thumb" data-src="https://drive.google.com/file/d/1Cs-8Lp06aY9z4gHBpi0Dxv2NmikbVNzZ/preview">
+          <div class="thumb-overlay" style="background:linear-gradient(145deg,#1a0e05,#2e1a08);">
+            <div class="play-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--teal)"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
         </div>
         <div class="proj-body">
           <div class="proj-tag">Teaser</div>
@@ -765,8 +850,10 @@ a:focus-visible, button:focus-visible{
       </div>
 
       <div class="glass proj-card">
-        <div class="proj-thumb">
-          <iframe src="https://drive.google.com/file/d/1MUQWapeQ6bjaLK6JeaAdg1vQbDUSBl1f/preview" allowfullscreen loading="lazy" title="Action Edit"></iframe>
+        <div class="proj-thumb" data-src="https://drive.google.com/file/d/1MUQWapeQ6bjaLK6JeaAdg1vQbDUSBl1f/preview">
+          <div class="thumb-overlay" style="background:linear-gradient(145deg,#0d0d1a,#1a1a2e);">
+            <div class="play-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--teal)"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
         </div>
         <div class="proj-body">
           <div class="proj-tag">Action / Drama</div>
@@ -777,8 +864,10 @@ a:focus-visible, button:focus-visible{
       </div>
 
       <div class="glass proj-card">
-        <div class="proj-thumb">
-          <iframe src="https://drive.google.com/file/d/1KqXz1iupWAGyFwn9JTxNlNlQmx7neyH7/preview" allowfullscreen loading="lazy" title="Store Commercial"></iframe>
+        <div class="proj-thumb" data-src="https://drive.google.com/file/d/1KqXz1iupWAGyFwn9JTxNlNlQmx7neyH7/preview">
+          <div class="thumb-overlay" style="background:linear-gradient(145deg,#0a1a2e,#163040);">
+            <div class="play-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--teal)"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
         </div>
         <div class="proj-body">
           <div class="proj-tag">Commercial</div>
@@ -789,8 +878,10 @@ a:focus-visible, button:focus-visible{
       </div>
 
       <div class="glass proj-card">
-        <div class="proj-thumb">
-          <iframe src="https://drive.google.com/file/d/13C7OgsvzcRPGPAC1gApxCH6s4e0AvI7z/preview" allowfullscreen loading="lazy" title="Real Estate Walkthrough"></iframe>
+        <div class="proj-thumb" data-src="https://drive.google.com/file/d/13C7OgsvzcRPGPAC1gApxCH6s4e0AvI7z/preview">
+          <div class="thumb-overlay" style="background:linear-gradient(145deg,#0a2e1a,#0f3d20);">
+            <div class="play-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--teal)"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
         </div>
         <div class="proj-body">
           <div class="proj-tag">Real Estate</div>
@@ -801,8 +892,10 @@ a:focus-visible, button:focus-visible{
       </div>
 
       <div class="glass proj-card">
-        <div class="proj-thumb">
-          <iframe src="https://drive.google.com/file/d/1Z6kuAifnEA89fOhVU6H8u-tyUV6OG6gF/preview" allowfullscreen loading="lazy" title="Property Introduction Edit"></iframe>
+        <div class="proj-thumb" data-src="https://drive.google.com/file/d/1Z6kuAifnEA89fOhVU6H8u-tyUV6OG6gF/preview">
+          <div class="thumb-overlay" style="background:linear-gradient(145deg,#1a0a2e,#2e1540);">
+            <div class="play-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--teal)"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
         </div>
         <div class="proj-body">
           <div class="proj-tag">Real Estate</div>
@@ -858,6 +951,23 @@ a:focus-visible, button:focus-visible{
 
 <footer>© 2026 MASOUD JAFARI — VIDEO EDITOR</footer>
 
+<!-- Fullscreen Video Modal -->
+<div class="vid-modal" id="vidModal">
+  <div class="vid-modal-video">
+    <iframe id="modalIframe" src="" allowfullscreen allow="autoplay"></iframe>
+  </div>
+  <div class="vid-modal-actions">
+    <button class="btn-rewatch" id="btnRewatch">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-5.25"/></svg>
+      Watch Again
+    </button>
+    <button class="btn-exit" id="btnExit">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      Exit
+    </button>
+  </div>
+</div>
+
 <script>
 const reveals = document.querySelectorAll('.reveal');
 const io = new IntersectionObserver((entries)=>{
@@ -877,12 +987,42 @@ const navIO = new IntersectionObserver((entries)=>{
   });
 },{threshold:0.5});
 sections.forEach(s=>s && navIO.observe(s));
-
 marks.forEach(m=>{
-  m.addEventListener('click', ()=>{
+  m.addEventListener('click',()=>{
     document.querySelector(m.dataset.target).scrollIntoView({behavior:'smooth'});
   });
 });
+
+// ---- Fullscreen Video Modal ----
+const modal     = document.getElementById('vidModal');
+const mIframe   = document.getElementById('modalIframe');
+const btnRewatch= document.getElementById('btnRewatch');
+const btnExit   = document.getElementById('btnExit');
+let currentSrc  = '';
+
+document.querySelectorAll('.proj-thumb[data-src]').forEach(thumb=>{
+  thumb.addEventListener('click', function(){
+    currentSrc = this.dataset.src + '?rm=minimal&autoplay=1';
+    mIframe.src = currentSrc;
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+});
+
+btnRewatch.addEventListener('click', ()=>{
+  mIframe.src = '';
+  setTimeout(()=>{ mIframe.src = currentSrc; }, 100);
+});
+
+btnExit.addEventListener('click', closeModal);
+modal.addEventListener('click', e=>{ if(e.target === modal) closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+function closeModal(){
+  modal.classList.remove('open');
+  mIframe.src = '';
+  document.body.style.overflow = '';
+}
 
 // ---- Particle system ----
 const canvas = document.getElementById('particles');
