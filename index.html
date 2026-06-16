@@ -487,10 +487,6 @@ section{
   flex-shrink:0;
   cursor:pointer;
 }
-/* ===== proj-thumb ===== */
-.proj-thumb iframe,.proj-thumb video{display:none;}
-.proj-thumb.loaded::after{content:none;}
-/* Click-to-play overlay */
 .proj-thumb .thumb-overlay{
   position:absolute;
   inset:0;
@@ -499,10 +495,23 @@ section{
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:14px;
   background:linear-gradient(160deg,#0a1a0e 0%,#0f2419 100%);
   transition:.3s;
   cursor:pointer;
+}
+.thumb-cover{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:.75;
+  transition:.3s;
+}
+.proj-thumb:hover .thumb-cover{opacity:.5;}
+.proj-thumb:hover .play-btn{
+  background:rgba(57,255,140,.3);
+  transform:scale(1.1);
 }
 .proj-thumb .play-btn{
   width:60px;height:60px;
@@ -510,13 +519,9 @@ section{
   background:rgba(57,255,140,.15);
   border:2px solid var(--teal);
   display:flex;align-items:center;justify-content:center;
-  z-index:3;
   transition:.3s;
-  flex-shrink:0;
-}
-.proj-thumb:hover .play-btn{
-  background:rgba(57,255,140,.3);
-  transform:scale(1.1);
+  z-index:3;
+  position:relative;
 }
 .proj-thumb .play-btn svg{margin-left:4px;}
 
@@ -542,7 +547,9 @@ section{
 }
 .vid-modal-video iframe{
   position:absolute;
-  inset:0;width:100%;height:115%;
+  top:0;left:0;
+  width:100%;
+  height:115%;
   border:0;
 }
 .vid-modal-actions{
@@ -580,9 +587,6 @@ section{
   gap:6px;
   background:rgba(255,255,255,.03);
   border-top:1px solid var(--glass-border);
-  position:static;
-  z-index:auto;
-  margin-top:0;
 }
 .proj-tag{
   font-family:var(--mono);
@@ -824,6 +828,7 @@ a:focus-visible, button:focus-visible{
       <div class="glass proj-card">
         <div class="proj-thumb" data-src="https://drive.google.com/file/d/1IIG-BpfZU5K8wN6_PfHa1zXrNbb6Atbe/preview">
           <div class="thumb-overlay" style="background:linear-gradient(145deg,#0a2e1a,#163c28);">
+            <img class="thumb-cover" src="https://lh3.googleusercontent.com/d/1IIG-BpfZU5K8wN6_PfHa1zXrNbb6Atbe=w480" onerror="this.style.display='none'" alt="">
             <div class="play-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--teal)"><path d="M8 5v14l11-7z"/></svg></div>
           </div>
         </div>
@@ -838,6 +843,7 @@ a:focus-visible, button:focus-visible{
       <div class="glass proj-card">
         <div class="proj-thumb" data-src="https://drive.google.com/file/d/1Cs-8Lp06aY9z4gHBpi0Dxv2NmikbVNzZ/preview">
           <div class="thumb-overlay" style="background:linear-gradient(145deg,#1a0e05,#2e1a08);">
+            <img class="thumb-cover" src="https://lh3.googleusercontent.com/d/1Cs-8Lp06aY9z4gHBpi0Dxv2NmikbVNzZ=w480" onerror="this.style.display='none'" alt="">
             <div class="play-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--teal)"><path d="M8 5v14l11-7z"/></svg></div>
           </div>
         </div>
@@ -852,6 +858,7 @@ a:focus-visible, button:focus-visible{
       <div class="glass proj-card">
         <div class="proj-thumb" data-src="https://drive.google.com/file/d/1MUQWapeQ6bjaLK6JeaAdg1vQbDUSBl1f/preview">
           <div class="thumb-overlay" style="background:linear-gradient(145deg,#0d0d1a,#1a1a2e);">
+            <img class="thumb-cover" src="https://lh3.googleusercontent.com/d/1MUQWapeQ6bjaLK6JeaAdg1vQbDUSBl1f=w480" onerror="this.style.display='none'" alt="">
             <div class="play-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--teal)"><path d="M8 5v14l11-7z"/></svg></div>
           </div>
         </div>
@@ -866,6 +873,7 @@ a:focus-visible, button:focus-visible{
       <div class="glass proj-card">
         <div class="proj-thumb" data-src="https://drive.google.com/file/d/1KqXz1iupWAGyFwn9JTxNlNlQmx7neyH7/preview">
           <div class="thumb-overlay" style="background:linear-gradient(145deg,#0a1a2e,#163040);">
+            <img class="thumb-cover" src="https://lh3.googleusercontent.com/d/1KqXz1iupWAGyFwn9JTxNlNlQmx7neyH7=w480" onerror="this.style.display='none'" alt="">
             <div class="play-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--teal)"><path d="M8 5v14l11-7z"/></svg></div>
           </div>
         </div>
@@ -880,6 +888,7 @@ a:focus-visible, button:focus-visible{
       <div class="glass proj-card">
         <div class="proj-thumb" data-src="https://drive.google.com/file/d/13C7OgsvzcRPGPAC1gApxCH6s4e0AvI7z/preview">
           <div class="thumb-overlay" style="background:linear-gradient(145deg,#0a2e1a,#0f3d20);">
+            <img class="thumb-cover" src="https://lh3.googleusercontent.com/d/13C7OgsvzcRPGPAC1gApxCH6s4e0AvI7z=w480" onerror="this.style.display='none'" alt="">
             <div class="play-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--teal)"><path d="M8 5v14l11-7z"/></svg></div>
           </div>
         </div>
@@ -894,6 +903,7 @@ a:focus-visible, button:focus-visible{
       <div class="glass proj-card">
         <div class="proj-thumb" data-src="https://drive.google.com/file/d/1Z6kuAifnEA89fOhVU6H8u-tyUV6OG6gF/preview">
           <div class="thumb-overlay" style="background:linear-gradient(145deg,#1a0a2e,#2e1540);">
+            <img class="thumb-cover" src="https://lh3.googleusercontent.com/d/1Z6kuAifnEA89fOhVU6H8u-tyUV6OG6gF=w480" onerror="this.style.display='none'" alt="">
             <div class="play-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--teal)"><path d="M8 5v14l11-7z"/></svg></div>
           </div>
         </div>
@@ -969,24 +979,35 @@ a:focus-visible, button:focus-visible{
 </div>
 
 <script>
+// ---- Reveal: show all immediately as fallback, animate as enhancement ----
 const reveals = document.querySelectorAll('.reveal');
-const io = new IntersectionObserver((entries)=>{
-  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
-},{threshold:0.15});
-reveals.forEach(r=>io.observe(r));
+
+// Safety: show everything after 300ms regardless
+setTimeout(()=>{ reveals.forEach(r=>r.classList.add('in')); }, 300);
+
+// Enhancement: animate on scroll
+try {
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+  },{threshold:0.05});
+  reveals.forEach(r=>io.observe(r));
+} catch(e){}
 
 const marks = document.querySelectorAll('.tc-mark');
 const sections = [...marks].map(m=>document.querySelector(m.dataset.target));
-const navIO = new IntersectionObserver((entries)=>{
-  entries.forEach(entry=>{
-    if(entry.isIntersecting){
-      const idx = sections.indexOf(entry.target);
-      marks.forEach(m=>m.classList.remove('active'));
-      if(marks[idx]) marks[idx].classList.add('active');
-    }
-  });
-},{threshold:0.5});
-sections.forEach(s=>s && navIO.observe(s));
+try {
+  const navIO = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        const idx = sections.indexOf(entry.target);
+        marks.forEach(m=>m.classList.remove('active'));
+        if(marks[idx]) marks[idx].classList.add('active');
+      }
+    });
+  },{threshold:0.3});
+  sections.forEach(s=>s && navIO.observe(s));
+} catch(e){}
+
 marks.forEach(m=>{
   m.addEventListener('click',()=>{
     document.querySelector(m.dataset.target).scrollIntoView({behavior:'smooth'});
